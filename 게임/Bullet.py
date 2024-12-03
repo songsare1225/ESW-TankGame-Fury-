@@ -8,14 +8,18 @@ class Bullet:
         self.gravity = 150
         self.damage = 10
         self.angle = turret_angle
-        self.state = 'active'  # 'active', 'hit', 'exploding', 'finished'
+        self.state = 'active'  
         self.time = 0
 
-        # 초기 위치 (발사 위치)
+        # 위에서부터 차례대로, 총알의 속도 중적용되는 중력값, 데미지, 총알의 발사각도(포신 부양각에 맞춰서 변합니다)
+        # 총알의 상태와 총알이 발사된 뒤의 시간을 나타냅니다.
+
+        # 총알이 처음에 발사된 위치
         self.initial_position = np.array([position[0], position[1]])
+        #position 은 총알의 현재 위치를 나타냄
         self.position = np.array([position[0] - 1, position[1] - 1, position[0] + 1, position[1] + 1])
 
-        # 충돌한 위치 (중심 좌표)
+        # 총알이 충돌한 위치 
         self.explosion_center = None
 
         # 총알 이미지
@@ -31,10 +35,11 @@ class Bullet:
             self.explosion_frames.append(frame)
         self.current_frame = 0
 
-        # 초기 속도 구성 (발사 각도를 기반으로 속도 계산)
+        # 발사각에따라 초기속도가 다르므로, 이를 계산했습니다.
         self.velocity_x = self.speed * np.cos(np.radians(self.angle))
         self.velocity_y = -self.speed * np.sin(np.radians(self.angle))
 
+    # move는 총알이 이동할때의 매커니즘입니다.
     def move(self, time_step=0.02):
         if self.state == 'active':
             self.time += time_step
@@ -51,12 +56,12 @@ class Bullet:
                 new_y + self.image_size[1] // 2,
             ])
 
+    # collision check 는 총알이 충돌했는지, 아닌지를 확인하는 매서드입니다.
     def collision_check(self, targets, ignore_targets=None):
-        """
-        충돌 검사를 수행합니다.
-        :param targets: 충돌 가능한 대상 리스트
-        :param ignore_targets: 충돌을 무시할 대상 리스트 (기본값: None)
-        """
+       
+        # :param targets: 충돌 가능한 대상 리스트
+        # :param ignore_targets: 충돌을 무시할 대상 리스트 
+    
         if ignore_targets is None:
             ignore_targets = []
 
@@ -90,25 +95,22 @@ class Bullet:
             self.state = 'exploding'
             self.explosion_center = self.get_center()  # 충돌한 위치를 저장
 
+    # 폭발 애니메이션 구현용
     def animate_explosion(self):
-        """
-        폭발 애니메이션 진행
-        """
         if self.state == 'exploding':
             if self.current_frame < len(self.explosion_frames):
                 self.current_frame += 1
             else:
                 self.state = 'finished'  # 애니메이션 종료 상태로 변경
 
+    # 총알 중심의 좌표값을 계산(10, 10 사이즈 기준)
     def get_center(self):
-        """
-        현재 위치의 중심 좌표 반환
-        """
         return [
             (self.position[0] + self.position[2]) / 2,  # x 중심
             (self.position[1] + self.position[3]) / 2   # y 중심
         ]
 
+    # 두 객체가 충돌하는지 확인하기위한 매서드, 충돌여부는 두 객체의 경계값이 겹치는지 확인하여 판단합니다.
     @staticmethod
     def overlap(ego_position, other_position):
         return not (ego_position[2] < other_position[0] or

@@ -11,13 +11,12 @@ class Character:
         self.center = np.array([(self.position[0] + self.position[2]) / 2, (self.position[1] + self.position[3]) / 2])
         self.outline = "#FFFFFF"
 
-        # 장전 관련 변수 추가
+        # 장전 관련 변수 추가, 전차포가 무한정 발사될수없으므로 관련 데이터를 추가하려고했으나 시간, 기술적
+        # 한계로인해 하지않았습니다.
         self.last_shot_time = 0  # 마지막 총알 발사 시간
         self.reload_time = 2  # 장전 시간 (초)
         self.can_shoot = True  # 장전 완료 여부 (True: 발사 가능, False: 장전 중)
 
-        # 초록색 불빛 상태
-        self.green_light_on = False
 
     def move(self, command=None):
         pass
@@ -29,10 +28,10 @@ class Character:
     def move(self, command=None):
         if command['move'] == False:
             self.state = None
-            self.outline = "#FFFFFF"  # 기본 색상
+            self.outline = "#FFFFFF"  
         else:
             self.state = 'move'
-            self.outline = "#FF0000"  # 빨강색
+            self.outline = "#FF0000"  
 
             if command['up_pressed']:
                 self.position[1] -= 5
@@ -53,14 +52,3 @@ class Character:
         # 중앙 좌표 업데이트
         self.center = np.array([(self.position[0] + self.position[2]) / 2, (self.position[1] + self.position[3]) / 2])
 
-    def check_reload(self):
-        """
-        장전 시간이 완료되었는지 확인하는 함수
-        장전 시간이 완료되면 `can_shoot`을 True로 설정하고 초록색 불빛을 켬
-        """
-        current_time = time.time()
-        if not self.can_shoot and current_time - self.last_shot_time >= self.reload_time:
-            self.can_shoot = True
-            self.green_light_on = True  # 장전 완료되면 초록불 켬
-        elif self.can_shoot:
-            self.green_light_on = False  # 발사 가능 상태에서는 초록불 끄기

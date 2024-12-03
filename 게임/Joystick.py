@@ -52,3 +52,5 @@ class Joystick:
         # Make sure to create image with mode 'RGB' for color.
         self.width = self.disp.width
         self.height = self.disp.height
+
+        #조이스틱 class는 따로 수정한것없이 예제 내용 그대로 사용하였다.
